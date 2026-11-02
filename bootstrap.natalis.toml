@@ -1,0 +1,39 @@
+# Natalis reduced compiler profile.
+#
+# Invoke with:
+#   ./x build --config bootstrap.natalis.toml
+#
+# This profile is intentionally additive: it does not remove source or change
+# the default bootstrap configuration. It provides the baseline that reduction,
+# backend integration, and reproducibility work must continue to satisfy.
+
+[build]
+build = "x86_64-unknown-linux-gnu"
+host = ["x86_64-unknown-linux-gnu"]
+target = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "wasm32-unknown-unknown",
+]
+docs = false
+compiler-docs = false
+extended = false
+submodules = false
+
+[rust]
+# LLVM remains required by Natalis. Cranelift is the initial WebAssembly path.
+# TPDE will be added here only after it implements rustc's codegen-backend ABI.
+codegen-backends = ["llvm", "cranelift"]
+remap-debuginfo = true
+lto = "off"
+
+[target.wasm32-unknown-unknown]
+codegen-backends = ["cranelift"]
+
+# The AArch64 linker and C toolchain are host-provisioned. Set these explicitly
+# in a local overlay appropriate for the selected sysroot.
+[target.aarch64-unknown-linux-gnu]
+# cc = "/path/to/aarch64-linux-gnu-gcc"
+# cxx = "/path/to/aarch64-linux-gnu-g++"
+# ar = "/path/to/aarch64-linux-gnu-ar"
+# linker = "/path/to/aarch64-linux-gnu-gcc"
