@@ -112,15 +112,17 @@ safety requirements.
 
 ### Layer 1: scalar locals
 
-Recognize independent `Rvalue::BinaryOp` or `Rvalue::CheckedBinaryOp`
+Inspect independent `Rvalue::BinaryOp` and `Rvalue::CheckedBinaryOp`
 assignments when all operands are `Operand::Copy` of scalar local places and
-all destinations are scalar local places. Initial scalar types are integer and
-floating-point primitive types of the same concrete `Ty`.
+all destinations are scalar local places. Only an unchecked `BinaryOp` may be
+eligible in this layer; a `CheckedBinaryOp` is classified so that it can receive
+the deterministic `ObservableCheckOrder` rejection. Initial scalar types are
+integer and floating-point primitive types of the same concrete `Ty`.
 
-The assignments must have the same `OperationShape`, preserve the original
+Eligible assignments must have the same `OperationShape`, preserve the original
 statement order, and have pairwise-disjoint read/write local roots. Checked
-arithmetic is rejected until a later layer proves the same overflow behavior
-and panic/check ordering lane by lane.
+arithmetic remains rejected until a later layer proves the same overflow
+behavior and panic/check ordering lane by lane.
 
 Accepted shape:
 
